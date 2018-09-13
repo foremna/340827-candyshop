@@ -1,36 +1,54 @@
-'use sctict';
+"use strict";
 
 var tastes = ['Чесночные сливки', 'Огуречный педант', 'Молочная хрюша', 'Грибной шейк', 'Баклажановое безумие', 'Паприколу итальяно', 'Нинзя-удар васаби', 'Хитрый баклажан', 'Горчичный вызов', 'Кедровая липучка', 'Корманный портвейн', 'Чилийский задира', 'Беконовый взрыв', 'Арахис vs виноград', 'Сельдерейная душа', 'Початок в бутылке', 'Чернющий мистер чеснок', 'Раша федераша', 'Кислая мина', 'Кукурузное утро', 'Икорный фуршет', 'Новогоднее настроение', 'С пивком потянет', 'Мисс креветка', 'Бесконечный взрыв', 'Невинные винные', 'Бельгийское пенное', 'Острый язычок'];
 
-var pictures = ['gum-cedar.jpg', 'gum-chile.jpg', 'gum-eggplant.jpg', 'gum-mustard.jpg', 'gum-portwine.jpg', 'gum-wasabi.jpg', 'ice-cucumber.jpg', 'ice-eggplant.jpg', 'ice-garlic.jpg', 'ice-italian.jpg', 'ice-mushroom.jpg', 'marmalade-beer.jpg', 'marmalade-caviar.jpg', 'marmalade-corn.jpg', 'marmalade-new-year.jpg', 'marmalade-sour.jpg', 'marshmallow-bacon.jpg', 'marshmallow-beer.jpg', 'marshmallow-shrimp.jpg', 'marshmallow-spicy.jpg', 'marshmallow-wine.jpg', 'soda-bacon.jpg', 'soda-celery.jpg', 'soda-cob.jpg', 'soda-garlic.jpg', 'soda-peanut-grapes.jpg', 'soda-russian.jpg'];
+var pictures = ['gum-cedar', 'gum-chile', 'gum-eggplant', 'gum-mustard', 'gum-portwine', 'gum-wasabi', 'ice-cucumber', 'ice-eggplant', 'ice-garlic', 'ice-italian', 'ice-mushroom', 'marmalade-beer', 'marmalade-caviar', 'marmalade-corn', 'marmalade-new-year', 'marmalade-sour', 'marshmallow-bacon', 'marshmallow-beer', 'marshmallow-shrimp', 'marshmallow-spicg', 'marshmallow-wine', 'soda-bacon', 'soda-celery', 'soda-cob', 'soda-garlic', 'soda-peanut-grapes', 'soda-russian'];
 
 var contents = ['молоко', 'сливки', 'вода', 'пищевой краситель', 'патока', 'ароматизатор бекона', 'ароматизатор свинца', 'ароматизатор дуба, идентичный натуральному', 'ароматизатор картофеля', 'лимонная кислота', 'загуститель', 'эмульгатор', 'консервант: сорбат калия', 'посолочная смесь: соль нитрит натрия', 'ксилит', 'карбамид', 'вилларибо', 'виллабаджо'];
 
-var choiseTastes = function(){
-    var gustos = [];
+function getRandomInRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}; ///Функция, которая выводит случайное число в диапазоне
+
+var getRandomBool = function(bool) {
+    bool = bool || Math.random();
+    if(bool >= 0.5) {
+        return 'Содержит сахар';
+    } else {
+        return 'Без сахара';
+    }
+    return gustos;
+};
+
+var gustos = [];
+
+var choiseTastes = function() {
     for (var i = 0; i < 26; i++){
         var choises = {
-            name: ; //Вкусы ведь в массиве tastes
-            picture: ,
-            amount: (0, 20),
-            price: (100, 1500),
-            weight {
-                value: Math.random(1, 5,
-                number: Math.random(10, 900)
+            name: tastes[i],
+            picture: pictures[i],
+            amount: getRandomInRange(0, 20),
+            price: getRandomInRange(100, 1500),
+            weight: getRandomInRange(30, 300),
+            rating: {
+                value: getRandomInRange(1, 5),
+                number: getRandomInRange(10, 900)
             },
-            nutritionFacts {
-                var sugar = function(){
-                    return.Math.random() > 0.3;
-                };
-            },
-            energy: Math.random(70, 500),
-    };
-};
+            nutritionFacts: {
+                sugar: getRandomBool(),
+                energy: getRandomInRange(70, 500)
+            }
+        };
+        gustos.push(choises);
+    }
+
+console.log(choiseTastes())
 
 var cardsAddLoad = document.querySelector('.catalog__cards');
 cardsAddLoad.classList.remove('catalog__cards--load');
 
-var cardsHiddenLoad = document.querySelector('.catalog__load'); cardsHiddenLoad.classList.add('visually-hidden');
+var cardsHiddenLoad = document.querySelector('.catalog__load'); 
+cardsHiddenLoad.classList.add('visually-hidden');
     
 var cardTemplate = document.querySelector('#card')
     .content
@@ -38,4 +56,29 @@ var cardTemplate = document.querySelector('#card')
 
 var templateStyle = document.querySelector('#card');
     
-templateStyle.setAttribute ('style', 'display: block;');
+templateStyle.setAttribute('style', 'display: block;');
+    
+var stock = document.querySelector('#card')
+    .content
+    .querySelector('.card--in-stock');
+    
+for (var i = 0; amount < tastes; i++){ 
+    console.log(amount, tastes);
+    var cardInStock = stock.cloneNode(true); 
+    stock.appendChild(cardInStock);
+};
+
+if(amount > 5) {
+    cardTemplate.classList.add('card--in-stock')
+};
+    
+if(amount <= 5 && >= 1) {
+    cardTemplate.classList.remove('card--in-stock')
+    cardTemplate.classList.add('card--little')
+};
+    
+if(amount === 0) {
+    cardTemplate.classList.remove('card--in-stock')
+    cardTemplate.classList.remove('card--in-little')
+    cardTemplate.classList.add('card--soon')
+};
