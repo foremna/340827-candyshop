@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var tastes = ['Чесночные сливки', 'Огуречный педант', 'Молочная хрюша', 'Грибной шейк', 'Баклажановое безумие', 'Паприколу итальяно', 'Нинзя-удар васаби', 'Хитрый баклажан', 'Горчичный вызов', 'Кедровая липучка', 'Корманный портвейн', 'Чилийский задира', 'Беконовый взрыв', 'Арахис vs виноград', 'Сельдерейная душа', 'Початок в бутылке', 'Чернющий мистер чеснок', 'Раша федераша', 'Кислая мина', 'Кукурузное утро', 'Икорный фуршет', 'Новогоднее настроение', 'С пивком потянет', 'Мисс креветка', 'Бесконечный взрыв', 'Невинные винные', 'Бельгийское пенное', 'Острый язычок'];
 
@@ -6,17 +6,18 @@ var pictures = ['gum-cedar', 'gum-chile', 'gum-eggplant', 'gum-mustard', 'gum-po
 
 var ingridients = ['молоко', 'сливки', 'вода', 'пищевой краситель', 'патока', 'ароматизатор бекона', 'ароматизатор свинца', 'ароматизатор дуба, идентичный натуральному', 'ароматизатор картофеля', 'лимонная кислота', 'загуститель', 'эмульгатор', 'консервант: сорбат калия', 'посолочная смесь: соль нитрит натрия', 'ксилит', 'карбамид', 'вилларибо', 'виллабаджо'];
 
-function getRandomInRange(min, max) {
+var getRandomInRange = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-var getRandomBool = function(bool) {
-    bool = bool || Math.random();
-    if(bool >= 0.5) {
-        return true;
-    } else {
-        return false;
-    }
+var getRandomBool = function (bool) {
+  bool = bool || Math.random();
+
+  if (bool >= 0.5) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 var gustos = [];
@@ -41,31 +42,29 @@ var randomTastesy = function (array) {
   return array.slice(0, randomLength).join(', ');
 };
 
-var choiseTastes = function() {
-    for (var i = 0; i < 26; i++){
-        var choises = {
-            name: tastes[i],
-            picture: pictures[i],
-            amount: getRandomInRange(0, 20),
-            price: getRandomInRange(100, 1500),
-            weight: getRandomInRange(30, 300),
-            rating: {
-                value: getRandomInRange(1, 5),
-                number: getRandomInRange(10, 900)
-            },
-            nutritionFacts: {
-                sugar: getRandomBool(),
-                energy: getRandomInRange(70, 500),
-                contents: randomTastesy(ingridients)
-            }
-        };
-        gustos.push(choises);
-    }
-}
+var choiseTastes = function () {
+  for (var i = 0; i < 26; i++) {
+    var choises = {
+      name: tastes[i],
+      picture: pictures[i],
+      amount: getRandomInRange(0, 20),
+      price: getRandomInRange(100, 1500),
+      weight: getRandomInRange(30, 300),
+      rating: {
+        value: getRandomInRange(1, 5),
+        number: getRandomInRange(10, 900)
+      },
+      nutritionFacts: {
+        sugar: getRandomBool(),
+        energy: getRandomInRange(70, 500),
+        contents: randomTastesy(ingridients)
+      }
+    };
+    gustos.push(choises);
+  }
+};
 
 choiseTastes();
-
-console.log(gustos)
 
 var cardsAddLoad = document.querySelector('.catalog__cards');
 cardsAddLoad.classList.remove('catalog__cards--load');
@@ -79,63 +78,73 @@ var cardTemplate = document.querySelector('#card')
 
 var wrap = document.querySelector('.catalog__cards-wrap');
 
-for (var i = 0; i < 26; i++) {
-  var cardClone = cardTemplate.cloneNode(true);
+var createCard = function (templateNode, dataArray, parent, className) {
+  var cardClone = templateNode.cloneNode(true);
 
-  if (gustos[i].amount > 5) {
+  if (dataArray[i].amount > 5) {
     cardClone.classList.add('card--in-stock');
-  } else if (gustos[i].amount <= 5 && gustos[i].amount >= 1) {
+  } else if (dataArray[i].amount <= 5 && dataArray[i].amount >= 1) {
     cardClone.classList.remove('card--in-stock');
     cardClone.classList.add('card--little');
-  } else if (gustos[i].amount === 0) {
+  } else if (dataArray[i].amount === 0) {
     cardClone.classList.remove('card--in-stock');
     cardClone.classList.add('card--soon');
   }
 
-  var cardTitleName = cardClone.querySelector('.card__title');
+  var cardTitleName = cardClone.querySelector('.' + className + '__title');
+  var cardImage = cardClone.querySelector('.' + className + '__img');
+  var cardPrice = cardClone.querySelector('.' + className + '__price');
 
-  var cardImage = cardClone.querySelector('.card__img');
+  cardTitleName.textContent = dataArray[i].name;
+  cardImage.src = 'img/cards/' + dataArray[i].picture + '.jpg';
+  cardImage.alt = dataArray[i].name;
+  cardPrice.innerHTML = dataArray[i].price + '<span class="card__currency">₽</span><span class="card__weight">/' + dataArray[i].weight + ' Г </span>';
 
-  var cardPrice = cardClone.querySelector('.card__price');
+  if (cardClone.querySelector('.stars__rating')) {
+    var starsRating = cardClone.querySelector('.stars__rating');
 
-  var starsRating = cardClone.querySelector('.stars__rating');
-
-  cardTitleName.textContent = gustos[i].name;
-  cardImage.src = 'img/cards/' + gustos[i].picture + '.jpg';
-  cardImage.alt = gustos[i].name;
-  cardPrice.innerHTML = gustos[i].price + '<span class="card__currency">₽</span><span class="card__weight">/' + gustos[i].weight + ' Г </span>';
-
-  if (gustos[i].rating.value === 4) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--four');
-  } else if (gustos[i].rating.value === 3) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--three');
-  } else if (gustos[i].rating.value === 2) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--two');
-  } else if (gustos[i].rating.value === 1) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--one');
+    if (dataArray[i].rating.value === 4) {
+      starsRating.classList.remove('stars__rating--five');
+      starsRating.classList.add('stars__rating--four');
+    } else if (dataArray[i].rating.value === 3) {
+      starsRating.classList.remove('stars__rating--five');
+      starsRating.classList.add('stars__rating--three');
+    } else if (dataArray[i].rating.value === 2) {
+      starsRating.classList.remove('stars__rating--five');
+      starsRating.classList.add('stars__rating--two');
+    } else if (dataArray[i].rating.value === 1) {
+      starsRating.classList.remove('stars__rating--five');
+      starsRating.classList.add('stars__rating--one');
+    }
   }
 
-  var starCount = cardClone.querySelector('.star__count');
+  if (cardClone.querySelector('.star__count')) {
+    var starCount = cardClone.querySelector('.star__count');
 
-  starCount.textContent = gustos[i].rating.number;
-
-  var cardCharacteristic = cardClone.querySelector('.card__characteristic');
-
-  if (gustos[i].nutritionFacts.sugar >= 0.5) {
-    cardCharacteristic.innerHTML = '<p>Содержит сахар</p>';
-  } else {
-    cardCharacteristic.innerHTML = '<p>Без сахара</p>';
+    starCount.textContent = dataArray[i].rating.number;
   }
 
-  var compositionList = cardClone.querySelector('.card__composition-list');
+  if (cardClone.querySelector('.card__characteristic')) {
+    var cardCharacteristic = cardClone.querySelector('.card__characteristic');
 
-  compositionList.textContent = gustos[i].nutritionFacts.contents;
+    if (dataArray[i].nutritionFacts.sugar >= 0.5) {
+      cardCharacteristic.innerHTML = '<p>Содержит сахар</p>';
+    } else {
+      cardCharacteristic.innerHTML = '<p>Без сахара</p>';
+    }
+  }
 
-  wrap.appendChild(cardClone);
+  if (cardClone.querySelector('.card__composition-list')) {
+    var compositionList = cardClone.querySelector('.card__composition-list');
+
+    compositionList.textContent = dataArray[i].nutritionFacts.contents;
+  }
+
+  parent.appendChild(cardClone);
+};
+
+for (var i = 0; i < 26; i++) {
+  createCard(cardTemplate, gustos, wrap, 'card');
 }
 
 var basket = document.querySelector('.goods__cards');
@@ -145,54 +154,12 @@ var cardOrderGoods = document.querySelector('#card-order')
   .querySelector('.goods_card');
 
 for (i = 0; i < 3; i++) {
-
-  var cardGoodClone = cardOrderGoods.cloneNode(true);
-
-  if (gustos[i].amount > 5) {
-    cardGoodClone.classList.add('card--in-stock');
-  } else if (gustos[i].amount <= 5 && gustos[i].amount >= 1) {
-    cardGoodClone.classList.remove('card--in-stock');
-    cardGoodClone.classList.add('card--little');
-  } else if (gustos[i].amount === 0) {
-    cardGoodClone.classList.remove('card--in-stock');
-    cardGoodClone.classList.add('card--soon');
-  }
-
-  cardTitleName.textContent = gustos[i].name;
-  cardImage.src = 'img/cards/' + gustos[i].picture + '.jpg';
-  cardImage.alt = gustos[i].name;
-  cardPrice.innerHTML = gustos[i].price + '<span class="card__currency">₽</span><span class="card__weight">/' + gustos[i].weight + ' Г </span>';
-
-  if (gustos[i].rating.value === 4) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--four');
-  } else if (gustos[i].rating.value === 3) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--three');
-  } else if (gustos[i].rating.value === 2) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--two');
-  } else if (gustos[i].rating.value === 1) {
-    starsRating.classList.remove('stars__rating--five');
-    starsRating.classList.add('stars__rating--one');
-  }
-
-  starCount.textContent = gustos[i].rating.number;
-
-  if (gustos[i].nutritionFacts.sugar >= 0.5) {
-    cardCharacteristic.innerHTML = '<p>Содержит сахар</p>';
-  } else {
-    cardCharacteristic.innerHTML = '<p>Без сахара</p>';
-  }
-
-  compositionList.textContent = gustos[i].nutritionFacts.contents;
-
-  basket.appendChild(cardGoodClone);
+  createCard(cardOrderGoods, gustos, basket, 'card-order');
 }
 
 var goodCardRemove = document.querySelector('.goods__cards');
 
-goodCardRemove.classList.remove('goods__cards--empty')
+goodCardRemove.classList.remove('goods__cards--empty');
 
 var goodEmptyAdd = document.querySelector('.goods__card-empty');
 
