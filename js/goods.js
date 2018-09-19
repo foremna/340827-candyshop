@@ -76,7 +76,7 @@ var cardTemplate = document.querySelector('#card')
     .content
     .querySelector('.catalog__card');
 
-var wrap = document.querySelector('.catalog__cards-wrap');
+var wrap = document.querySelector('.catalog__cards');
 
 var createCard = function (templateNode, dataArray, parent, className) {
   var cardClone = templateNode.cloneNode(true);
