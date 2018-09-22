@@ -40,12 +40,12 @@ var getRandomTastes = function (array) {
   return array.slice(1, randomLength).join(', ');
 };
 
-var getObject = function () {
+var getSidewaysDataArray = function () {
   var gustos = [];
   for (var i = 0; i < 26; i++) {
     gustos[i] = {
-      name: tastes[getRandomInRange(1, tastes.length - 1)],
-      picture: pictures[getRandomInRange(1, pictures.length - 1)],
+      name: tastes[getRandomInRange(0, tastes.length - 1)],
+      picture: pictures[getRandomInRange(0, pictures.length - 1)],
       amount: getRandomInRange(0, 20),
       price: getRandomInRange(100, 1500),
       weight: getRandomInRange(30, 300),
@@ -63,9 +63,9 @@ var getObject = function () {
   return gustos;
 };
 
-var gustos = getObject();
+var gustos = getSidewaysDataArray();
 
-var cardsHiddenAndAdd = function () {
+var showCatalog = function () {
   var cardsAddLoad = document.querySelector('.catalog__cards');
   cardsAddLoad.classList.remove('catalog__cards--load');
 
@@ -73,7 +73,7 @@ var cardsHiddenAndAdd = function () {
   cardsHiddenLoad.classList.add('visually-hidden');
 };
 
-cardsHiddenAndAdd();
+showCatalog();
 
 var cardTemplate = document.querySelector('#card')
     .content
@@ -81,71 +81,75 @@ var cardTemplate = document.querySelector('#card')
 
 var wrap = document.querySelector('.catalog__cards');
 
-var createCard = function (templateNode, dataArray, parent, className) {
-  var cardClone = templateNode.cloneNode(true);
-
-  if (dataArray[i].amount > 5) {
-    cardClone.classList.add('card--in-stock');
-  } else if (dataArray[i].amount >= 1) {
-    cardClone.classList.add('card--little');
-  } else if (dataArray[i].amount === 0) {
-    cardClone.classList.add('card--soon');
+var createCard = function (templateNode, dataArray, parent, className, quantity) {
+  if (quantity) {
+    dataArray = dataArray.slice(0, quantity);
   }
 
-  var cardTitleName = cardClone.querySelector('.' + className + '__title');
-  var cardImage = cardClone.querySelector('.' + className + '__img');
-  var cardPrice = cardClone.querySelector('.' + className + '__price');
+  dataArray.forEach(function (it) {
+    var cardClone = templateNode.cloneNode(true);
 
-  cardTitleName.textContent = dataArray[i].name;
-  cardImage.src = 'img/cards/' + dataArray[i].picture + '.jpg';
-  cardImage.alt = dataArray[i].name;
-  cardPrice.innerHTML = dataArray[i].price + '<span class="card__currency">₽</span><span class="card__weight">/' + dataArray[i].weight + ' Г </span>';
-
-  if (cardClone.querySelector('.stars__rating')) {
-    var starsRating = cardClone.querySelector('.stars__rating');
-
-    switch (dataArray[i].rating.value) {
-      case 4:
-        starsRating.classList.add('stars__rating--four');
-        break;
-      case 3:
-        starsRating.classList.add('stars__rating--three');
-        break;
-      case 2:
-        starsRating.classList.add('stars__rating--two');
-        break;
-      case 1:
-        starsRating.classList.add('stars__rating--one');
-        break;
-      default:
-        starsRating.classList.add('stars__rating--five');
+    if (it.amount > 5) {
+      cardClone.classList.add('card--in-stock');
+    } else if (it.amount >= 1) {
+      cardClone.classList.add('card--little');
+    } else if (it.amount === 0) {
+      cardClone.classList.add('card--soon');
     }
-  }
 
-  if (cardClone.querySelector('.star__count')) {
-    var starCount = cardClone.querySelector('.star__count');
+    var cardTitleName = cardClone.querySelector('.' + className + '__title');
+    var cardImage = cardClone.querySelector('.' + className + '__img');
+    var cardPrice = cardClone.querySelector('.' + className + '__price');
 
-    starCount.textContent = dataArray[i].rating.number;
-  }
+    cardTitleName.textContent = it.name;
+    cardImage.src = 'img/cards/' + it.picture + '.jpg';
+    cardImage.alt = it.name;
+    cardPrice.innerHTML = it.price + '<span class="card__currency">₽</span><span class="card__weight">/' + it.weight + ' Г </span>';
 
-  if (cardClone.querySelector('.card__characteristic')) {
-    var cardCharacteristic = cardClone.querySelector('.card__characteristic');
+    if (cardClone.querySelector('.stars__rating')) {
+      var starsRating = cardClone.querySelector('.stars__rating');
 
-    cardCharacteristic.innerHTML = (dataArray[i].nutritionFacts.sugar >= 0.5) ? '<p>Содержит сахар</p>' : '<p>Без сахара</p>';
-  }
+      switch (it.rating.value) {
+        case 5:
+          starsRating.classList.add('stars__rating--five');
+          break;
+        case 4:
+          starsRating.classList.add('stars__rating--four');
+          break;
+        case 3:
+          starsRating.classList.add('stars__rating--three');
+          break;
+        case 2:
+          starsRating.classList.add('stars__rating--two');
+          break;
+        case 1:
+          starsRating.classList.add('stars__rating--one');
+          break;
+        default:
+          break;
+      }
+    }
 
-  if (cardClone.querySelector('.card__composition-list')) {
-    var compositionList = cardClone.querySelector('.card__composition-list');
+    if (cardClone.querySelector('.star__count')) {
+      var starCount = cardClone.querySelector('.star__count');
+      starCount.textContent = it.rating.number;
+    }
 
-    compositionList.textContent = dataArray[i].nutritionFacts.contents;
-  }
+    if (cardClone.querySelector('.card__characteristic')) {
+      var cardCharacteristic = cardClone.querySelector('.card__characteristic');
+      cardCharacteristic.innerHTML = it.nutritionFacts.sugar >= 0.5 ? '<p>Содержит сахар</p>' : '<p>Без сахара</p>';
+    }
 
-  parent.appendChild(cardClone);
+    if (cardClone.querySelector('.card__composition-list')) {
+      var compositionList = cardClone.querySelector('.card__composition-list');
+      compositionList.textContent = it.nutritionFacts.contents;
+    }
+
+    parent.appendChild(cardClone);
+  });
 };
 
-for (var i = 0; i < 26; i++) {
-  createCard(cardTemplate, gustos, wrap, 'card');
-}
+createCard(cardTemplate, gustos, wrap, 'card');
 
 var basket = document.querySelector('.goods__cards');
 
@@ -153,11 +157,9 @@ var cardOrderGoods = document.querySelector('#card-order')
   .content
   .querySelector('.goods_card');
 
-for (i = 0; i < 3; i++) {
-  createCard(cardOrderGoods, gustos, basket, 'card-order');
-}
+createCard(cardOrderGoods, gustos, basket, 'card-order', 3);
 
-var goodCardRemovesAndAdd = function () {
+var showGood = function () {
   var goodCardRemove = document.querySelector('.goods__cards');
 
   goodCardRemove.classList.remove('goods__cards--empty');
@@ -167,4 +169,4 @@ var goodCardRemovesAndAdd = function () {
   goodEmptyAdd.classList.add('visually-hidden');
 };
 
-goodCardRemovesAndAdd();
+showGood();
