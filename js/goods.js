@@ -3,6 +3,7 @@
 var tastes = ['Чесночные сливки', 'Огуречный педант', 'Молочная хрюша', 'Грибной шейк', 'Баклажановое безумие', 'Паприколу итальяно', 'Нинзя-удар васаби', 'Хитрый баклажан', 'Горчичный вызов', 'Кедровая липучка', 'Корманный портвейн', 'Чилийский задира', 'Беконовый взрыв', 'Арахис vs виноград', 'Сельдерейная душа', 'Початок в бутылке', 'Чернющий мистер чеснок', 'Раша федераша', 'Кислая мина', 'Кукурузное утро', 'Икорный фуршет', 'Новогоднее настроение', 'С пивком потянет', 'Мисс креветка', 'Бесконечный взрыв', 'Невинные винные', 'Бельгийское пенное', 'Острый язычок'];
 var pictures = ['gum-cedar', 'gum-chile', 'gum-eggplant', 'gum-mustard', 'gum-portwine', 'gum-wasabi', 'ice-cucumber', 'ice-eggplant', 'ice-garlic', 'ice-italian', 'ice-mushroom', 'marmalade-beer', 'marmalade-caviar', 'marmalade-corn', 'marmalade-new-year', 'marmalade-sour', 'marshmallow-bacon', 'marshmallow-beer', 'marshmallow-shrimp', 'marshmallow-spicy', 'marshmallow-wine', 'soda-bacon', 'soda-celery', 'soda-cob', 'soda-garlic', 'soda-peanut-grapes', 'soda-russian'];
 var ingridients = ['молоко', 'сливки', 'вода', 'пищевой краситель', 'патока', 'ароматизатор бекона', 'ароматизатор свинца', 'ароматизатор дуба, идентичный натуральному', 'ароматизатор картофеля', 'лимонная кислота', 'загуститель', 'эмульгатор', 'консервант: сорбат калия', 'посолочная смесь: соль нитрит натрия', 'ксилит', 'карбамид', 'вилларибо', 'виллабаджо'];
+var basketDataObj = {};
 
 var getRandomInRange = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -131,11 +132,7 @@ var createCard = function (node, data, className) {
   }
 };
 
-var createCards = function (templateNode, dataArray, parent, className, quantity) {
-  if (quantity) {
-    dataArray = dataArray.slice(0, quantity);
-  }
-
+var createCards = function (templateNode, dataArray, parent, className) {
   dataArray.forEach(function (it) {
     var cardClone = templateNode.cloneNode(true);
 
@@ -145,8 +142,31 @@ var createCards = function (templateNode, dataArray, parent, className, quantity
   });
 };
 
+var fillBasket = function () {
+  gustos.slice(0, 3).forEach(function (it) {
+    addProductBasket(it.element);
+  });
+};
+
 var basket = document.querySelector('.goods__cards');
 var cardOrderGoods = document.querySelector('#card-order').content.querySelector('.goods_card');
+
+var addProductBasket = function (node) {
+  var productData = Object.assign({}, gustos.filter(function (it) {
+    return it.element === node;
+  })[0]);
+
+  var isInBasket = Object.keys(basketDataObj).some(function (it) {
+    return it === productData.name;
+  });
+
+  if (isInBasket) {
+    basketDataObj[productData.name].element.querySelector('.card-order__count').value++;
+  } else {
+    createCards(cardOrderGoods, [productData], basket, 'card-order');
+    basketDataObj[productData.name] = productData;
+  }
+};
 
 var showGood = function () {
   var goodCardRemove = document.querySelector('.goods__cards');
@@ -156,7 +176,14 @@ var showGood = function () {
   goodEmptyAdd.classList.add('visually-hidden');
 };
 
-createCards(cardTemplate, gustos, wrap, 'card');
-createCards(cardOrderGoods, gustos, basket, 'card-order', 3);
+var onDocumentClick = function (evt) {
+  if (evt.target.classList.contains('card__btn')) {
+    evt.preventDefault();
+    addProductBasket(evt.target.closest('.catalog__card'));
+  }
+};
 
+createCards(cardTemplate, gustos, wrap, 'card');
+fillBasket();
 showGood();
+document.addEventListener('click', onDocumentClick);
