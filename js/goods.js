@@ -188,10 +188,10 @@ fillBasket();
 showGood();
 document.addEventListener('click', onDocumentClick);
 
-var onBtnDecreaseClick = function (evt) {
-  var cardCount = document.querySelector('.card-order__count');
-  evt.target = document.querySelector('.card-order__btn--decrease');
-  evt.target.addEventListener('click', function () {
-    cardCount.textContent -= 1;
-  });
-};
+var cardCount = document.querySelector('.card-order__count');
+
+var btnDecrease = document.querySelector('.card-order__btn--decrease');
+
+btnDecrease.addEventListener('click', function() {
+  cardCount.value--;
+});
