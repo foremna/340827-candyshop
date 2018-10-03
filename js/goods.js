@@ -190,8 +190,8 @@ document.addEventListener('click', onDocumentClick);
 
 var cardCount = document.querySelector('.card-order__count');
 
-var btnDecrease = document.querySelector('.card-order__btn--decrease');
+evt.target.querySelector('.card-order__btn--decrease');
 
-btnDecrease.addEventListener('click', function() {
+evt.target.addEventListener('click', function(evt) {
   cardCount.value--;
 });
