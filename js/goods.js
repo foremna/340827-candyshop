@@ -6,9 +6,9 @@ var ingridients = ['молоко', 'сливки', 'вода', 'пищевой �
 var basketDataObj = {};
 var headerBasket = document.querySelector('.main-header__basket');
 
-// Цена товара
-var MIN_PRICE = 100;
-var MAX_PRICE = 1500;
+// Цена товара // на будущее - чтобы не забыть
+// var MIN_PRICE = 100;
+// var MAX_PRICE = 1500;
 
 var getRandomInRange = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -308,7 +308,7 @@ var sumPrice = function (parent) {
 // };
 
 // Находим на странице поле оформления заказа
-var orderForm= document.querySelector('#order');
+var orderForm = document.querySelector('#order');
 var payment = orderForm.querySelector('.payment');
 var paymentCash = payment.querySelector('.payment__cash-wrap');
 var paymentCard = payment.querySelector('.payment__card-wrap');
@@ -340,18 +340,17 @@ payment.addEventListener('click', switchPaymentMethods);
 var delivery = orderForm.querySelector('.deliver');
 var deliveryStore = delivery.querySelector('.deliver__store');
 var deliveryCourier = delivery.querySelector('.deliver__courier');
-var deliveryFloor = delivery.querySelector('#deliver__floor');
 
 // Переключение способа доставки
 var switchDeliveryMethods = function (evt) {
   if (evt.target.id === 'deliver__courier') {
     deliveryCourier.classList.remove('visually-hidden');
     deliveryStore.classList.add('visually-hidden');
-    disableField(deliveryCourier, false);
+    disabledInput(deliveryCourier, false);
   } else if (evt.target.id === 'deliver__store') {
     deliveryStore.classList.remove('visually-hidden');
     deliveryCourier.classList.add('visually-hidden');
-    disableField(deliveryCourier, true);
+    disabledInput(deliveryCourier, true);
   }
 };
 
@@ -359,7 +358,7 @@ delivery.addEventListener('click', switchDeliveryMethods);
 
 // Кнопки ползунка цены
 var rangeFilter = document.querySelector('.range__filter');
-var rangeBtnRight = rangeFilter.querySelector('.range__btn--right');
+// на будущее задание var rangeBtnRight = rangeFilter.querySelector('.range__btn--right');
 var rangeBtnLeft = rangeFilter.querySelector('.range__btn--left');
 
 
@@ -370,7 +369,7 @@ var rangeWidth = rangeFilter.offsetWidth;
 
 var calculatePercentageOfTheFilterWidths = function () {
   var procent = 100;
-  rangeWidth / procent * coordBtnLeft;
+  return coordBtnLeft / procent * rangeWidth;
 };
 
 rangeBtnLeft.addEventListener('mouseup', calculatePercentageOfTheFilterWidths);
