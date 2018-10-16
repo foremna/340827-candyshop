@@ -217,13 +217,13 @@ var toggleFavoriteClass = function (element) {
   element.classList.toggle('card__btn-favorite--selected');
 };
 
-var favoriteToggle = function (evt) {
-  if (evt.target.classList.contains('card__btn-favorite')) {
+var favoriteToggle = function (e) {
+  if (e.target.classList.contains('card__btn-favorite')) {
     toggleFavoriteClass();
   }
 };
 
-catalogCards.addEventListener('click', favoriteToggle);
+catalogCards.addEventListener('click', favoriteToggle());
 
 basket.addEventListener('click', function (e) {
   if (e.target.classList.contains('card-order__btn--decrease')) {
