@@ -158,9 +158,9 @@ var addProductBasket = function (node) {
   // Определяем название товара
   var title = node.querySelector('.card__title').textContent;
   // Создаем копию объекта с данными по товару, который мы выбрали
-  var productData = Object.assign({}, gustos.filter(function (it) {
+  var productData = Object.assign({}, gustos.find(function (it) {
     return it.name === title;
-  })[0]);
+  }));
 
   // Проверяем, находится ли уже в корзине выбранный товар, возвращаем true, если да.
   var isInBasket = Object.keys(basketDataObj).some(function (it) {
@@ -170,6 +170,8 @@ var addProductBasket = function (node) {
   // Если товар уже в корзине, увеличиваем его количество на 1, иначе создаем карточку товара и отрисовываем ее в корзине
   if (isInBasket) {
     basketDataObj[productData.name].element.querySelector('.card-order__count').value++;
+    var productDataQuantity = node.querySelector('.star__count').textContent;
+    node.querySelector('.star__count').textContent = --productDataQuantity;
   } else {
     createCards(cardOrderGoods, [productData], basket, 'card-order');
     productData.productCard = node;
@@ -207,6 +209,19 @@ var onWrapClick = function (evt) {
 createCards(cardTemplate, gustos, wrap, 'card');
 
 wrap.addEventListener('click', onWrapClick);
+
+// Добавляет товар в избранное
+var toggleFavoriteClass = function (element) {
+  element.classList.toggle('card__btn-favorite--selected');
+};
+
+var favoriteToggle = function (evt) {
+  if (evt.target.classList.contains('card__btn-favorite')) {
+    toggleFavoriteClass;
+  }
+};
+
+catalogCards.addEventListener('click', favoriteToggle);
 
 basket.addEventListener('click', function (e) {
   if (e.target.classList.contains('card-order__btn--decrease')) {
@@ -304,7 +319,6 @@ var sumPrice = function (parent) {
 };
 
 // var increaseQuantityProduct = function  () {
-
 // };
 
 // Находим на странице поле оформления заказа
@@ -367,9 +381,9 @@ var rangeBtnLeft = rangeFilter.querySelector('.range__btn--left');
 var coordBtnLeft = rangeBtnLeft.offsetLeft;
 var rangeWidth = rangeFilter.offsetWidth;
 
-var calculatePercentageOfTheFilterWidths = function () {
+var considersPercentage = function () {
   var procent = 100;
   return coordBtnLeft / procent * rangeWidth;
 };
 
-rangeBtnLeft.addEventListener('mouseup', calculatePercentageOfTheFilterWidths);
+rangeBtnLeft.addEventListener('mouseup', considersPercentage);
