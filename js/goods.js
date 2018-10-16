@@ -210,6 +210,8 @@ createCards(cardTemplate, gustos, wrap, 'card');
 
 wrap.addEventListener('click', onWrapClick);
 
+var catalogCards = document.querySelector('.catalog__cards');
+
 // Добавляет товар в избранное
 var toggleFavoriteClass = function (element) {
   element.classList.toggle('card__btn-favorite--selected');
@@ -217,7 +219,7 @@ var toggleFavoriteClass = function (element) {
 
 var favoriteToggle = function (evt) {
   if (evt.target.classList.contains('card__btn-favorite')) {
-    toggleFavoriteClass;
+    toggleFavoriteClass();
   }
 };
 
@@ -381,9 +383,9 @@ var rangeBtnLeft = rangeFilter.querySelector('.range__btn--left');
 var coordBtnLeft = rangeBtnLeft.offsetLeft;
 var rangeWidth = rangeFilter.offsetWidth;
 
-var considersPercentage = function () {
+var countsPercentageWidth = function () {
   var procent = 100;
   return coordBtnLeft / procent * rangeWidth;
 };
 
-rangeBtnLeft.addEventListener('mouseup', considersPercentage);
+rangeBtnLeft.addEventListener('mouseup', countsPercentageWidth);
