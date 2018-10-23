@@ -256,49 +256,53 @@ createCards(cardTemplate, gustos, cards, 'card');
 
 cards.addEventListener('click', onCardsClick);
 
-basket.addEventListener('click', function (e) {
-  var cardOrder = e.target.closest('.card-order');
-  var cardCount = cardOrder.querySelector('.card-order__count');
-  var cardName = cardOrder.querySelector('.card-order__title').textContent;
-  var goodsCards = document.querySelectorAll('.catalog__card');
-  var targetGoodsCard = Array.prototype.find.call(goodsCards, function (elem) {
-    return elem.querySelector('.card__title').textContent === cardName;
-  });
-  var currentProduct = gustos.find(function (elem) {
-    return elem.name === cardName;
-  });
-  if (e.target.classList.contains('card-order__btn--decrease')) {
-    decreaseAmount(cardName, targetGoodsCard, currentProduct);
+var addProductToCard = function () {
+  basket.addEventListener('click', function (e) {
+    var cardOrder = e.target.closest('.card-order');
+    var cardCount = cardOrder.querySelector('.card-order__count');
+    var cardName = cardOrder.querySelector('.card-order__title').textContent;
+    var goodsCards = document.querySelectorAll('.catalog__card');
+    var targetGoodsCard = Array.prototype.find.call(goodsCards, function (elem) {
+      return elem.querySelector('.card__title').textContent === cardName;
+    });
+    var currentProduct = gustos.find(function (elem) {
+      return elem.name === cardName;
+    });
+    if (e.target.classList.contains('card-order__btn--decrease')) {
+      decreaseAmount(cardName, targetGoodsCard, currentProduct);
 
-    if (cardCount.value < 1) {
+      if (cardCount.value < 1) {
+        basketData = basketData.filter(function (elem) {
+          return elem.name !== cardName;
+        });
+        basket.removeChild(cardOrder);
+        toShow();
+      }
+    }
+
+    if (e.target.classList.contains('card-order__btn--increase')) {
+      if (currentProduct.amount) {
+        increaseAmount(cardName, targetGoodsCard, currentProduct);
+      }
+    }
+
+    if (e.target.classList.contains('card-order__close')) {
+      e.preventDefault();
+      var productQuantity = parseInt(targetGoodsCard.querySelector('.star__count').textContent, 10);
+      targetGoodsCard.querySelector('.star__count').textContent = productQuantity + parseInt(cardCount.value, 10);
+      currentProduct.amount = productQuantity + parseInt(cardCount.value, 10);
       basketData = basketData.filter(function (elem) {
         return elem.name !== cardName;
       });
       basket.removeChild(cardOrder);
       toShow();
     }
-  }
 
-  if (e.target.classList.contains('card-order__btn--increase')) {
-    if (currentProduct.amount) {
-      increaseAmount(cardName, targetGoodsCard, currentProduct);
-    }
-  }
+    sumPrice();
+  });
+}
 
-  if (e.target.classList.contains('card-order__close')) {
-    e.preventDefault();
-    var productQuantity = parseInt(targetGoodsCard.querySelector('.star__count').textContent, 10);
-    targetGoodsCard.querySelector('.star__count').textContent = productQuantity + parseInt(cardCount.value, 10);
-    currentProduct.amount = productQuantity + parseInt(cardCount.value, 10);
-    basketData = basketData.filter(function (elem) {
-      return elem.name !== cardName;
-    });
-    basket.removeChild(cardOrder);
-    toShow();
-  }
-
-  sumPrice();
-});
+addProductToCard();
 
 var sumPrice = function () {
   var totalQuantity = basketData.reduce(function (acc, cur) {
