@@ -259,20 +259,20 @@ cards.addEventListener('click', onCardsClick);
 basket.addEventListener('click', function (e) {
   var cardOrder = e.target.closest('.card-order');
   var cardCount = cardOrder.querySelector('.card-order__count');
-  var cardName = cardOrder.querySelector('.card-order__title').textContent;
+  var holderCard = cardOrder.querySelector('.card-order__title').textContent;
   var goodsCards = document.querySelectorAll('.catalog__card');
   var targetGoodsCard = Array.prototype.find.call(goodsCards, function (elem) {
-    return elem.querySelector('.card__title').textContent === cardName;
+    return elem.querySelector('.card__title').textContent === holderCard;
   });
-  var currentProduct = basketData.find(function (elem) {
-    return elem.name === cardName;
+  var currentProduct = gustos.find(function (elem) {
+    return elem.name === holderCard;
   });
   if (e.target.classList.contains('card-order__btn--decrease')) {
-    decreaseAmount(cardName, targetGoodsCard, currentProduct);
+    decreaseAmount(holderCard, targetGoodsCard, currentProduct);
 
     if (cardCount.value < 1) {
       basketData = basketData.filter(function (elem) {
-        return elem.name !== cardName;
+        return elem.name !== holderCard;
       });
       basket.removeChild(cardOrder);
       toShow();
@@ -280,7 +280,9 @@ basket.addEventListener('click', function (e) {
   }
 
   if (e.target.classList.contains('card-order__btn--increase')) {
-    increaseAmount(cardName, targetGoodsCard, currentProduct);
+    if (currentProduct.amount) {
+      increaseAmount(holderCard, targetGoodsCard, currentProduct);
+    }
   }
 
   if (e.target.classList.contains('card-order__close')) {
@@ -288,7 +290,7 @@ basket.addEventListener('click', function (e) {
     var productQuantity = parseInt(targetGoodsCard.querySelector('.star__count').textContent, 10);
     targetGoodsCard.querySelector('.star__count').textContent = productQuantity + parseInt(cardCount.value, 10);
     basketData = basketData.filter(function (elem) {
-      return elem.name !== cardName;
+      return elem.name !== holderCard;
     });
     basket.removeChild(cardOrder);
     toShow();
