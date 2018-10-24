@@ -387,41 +387,21 @@ var paymentStatus = paymentCard.querySelector('.payment__card-status');
 
 // Алгоритм Луна
 
-// var luhnAlgorythm = function (cardValue) {
-//   var arr = cardValue.split('');
-//   var sum = 0;
-//   for (var i = 0; i < arr.length; i++) {
-//     arr[i] = parseInt(arr[i], 10);
-//     if (i % 2 === 0) {
-//       arr[i] *= 2;
-//     } else {
-//       arr[i] = arr[i];
-//     }
-//     if (arr[i] >= 10) {
-//       arr[i] -= 9;
-//     } else {
-//       arr[i] = arr[i];
-//     }
-//     sum += arr[i];
-//   }
-//   return sum % 10 === 0;
-// };
+var inputCardData = document.querySelector('.text-input__input');
 
-var inputCardData = document.querySelector(".text-input__input");
-
-var cardDataIntArray = function () {
+var algorithmLuhn = function () {
   var cardData = inputCardData.value;
   var cardDataArray = cardData.split('');
   var cardDataArraySum = cardDataArray.map(function (item) {
-      return parseInt(item, 10);
-    }).map(function (item) {
-      return item % 2 !== 0 ? item * 2 : item;
-    }).map(function (item) {
-      return item > 10 ? item - 9 : item;
-    }).reduce(function (sum, current) {
-      return sum + current;
-    }, 0);
-  return cardDataIntArray % 10 === 0;
+    return parseInt(item, 10);
+  }).map(function (item) {
+    return item % 2 !== 0 ? item * 2 : item;
+  }).map(function (item) {
+    return item > 10 ? item - 9 : item;
+  }).reduce(function (sum, current) {
+    return sum + current;
+  }, 0);
+  return cardDataArraySum % 10 === 0;
 };
 
 // Если поля пустые
@@ -437,7 +417,7 @@ var validations = {
 
 paymentCard.addEventListener('input', function (evt) {
   if (evt.target === inputCardNumbers) {
-    validations.inputCardNumbers = cardDataIntArray(evt.target.value);
+    validations.inputCardNumbers = algorithmLuhn(evt.target.value);
   }
   if (evt.target === periodCard) {
     validations.periodCard = evt.target.checkValidity();
