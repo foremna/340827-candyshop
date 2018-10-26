@@ -344,15 +344,25 @@ var delivery = orderForm.querySelector('.deliver');
 var deliveryStore = delivery.querySelector('.deliver__store');
 var deliveryCourier = delivery.querySelector('.deliver__courier');
 var deliveryBlock = document.querySelector('.deliver__toggle');
+var deliveryInputs = deliveryCourier.querySelectorAll('input, textarea');
 
 // Переключение способа доставки
-var switchDeliveryMethods = function () {
-  deliveryCourier.classList.toggle('visually-hidden');
-  deliveryStore.classList.toggle('visually-hidden');
-  var deliveryInputs = deliveryCourier.querySelectorAll('input, textarea');
-  deliveryInputs.forEach(function (input) {
-    input.toggleAttribute('disabled');
-  });
+
+var switchDeliveryMethods = function (evt) {
+  if (evt.target.id === 'deliver__courier' ||
+    evt.target.id === 'deliver__store') {
+    deliveryStore.classList.toggle('visually-hidden');
+    deliveryCourier.classList.toggle('visually-hidden');
+  }
+  if (deliveryCourier.classList.contains('visually-hidden')) {
+    deliveryInputs.forEach(function (it) {
+      it.disabled = true;
+    });
+  } else {
+    deliveryInputs.forEach(function (it) {
+      it.disabled = false;
+    });
+  }
 };
 
 deliveryBlock.addEventListener('change', switchDeliveryMethods);
@@ -387,10 +397,8 @@ var paymentStatus = paymentCard.querySelector('.payment__card-status');
 
 // Алгоритм Луна
 
-var inputCardData = document.querySelector('.text-input__input');
-
-var algorithmLuhn = function () {
-  var cardData = inputCardData.value;
+var checkCardNumberValidity = function (value) {
+  var cardData = value;
   var cardDataArray = cardData.split('');
   var cardDataArraySum = cardDataArray.map(function (item) {
     return parseInt(item, 10);
@@ -413,11 +421,9 @@ var validations = {
   holderCard: false
 };
 
-// Одобряем карту при валидации полей и верной карты
-
 paymentCard.addEventListener('input', function (evt) {
   if (evt.target === inputCardNumbers) {
-    validations.inputCardNumbers = algorithmLuhn(evt.target.value);
+    validations.inputCardNumbers = checkCardNumberValidity(evt.target.value);
   }
   if (evt.target === periodCard) {
     validations.periodCard = evt.target.checkValidity();
@@ -428,5 +434,96 @@ paymentCard.addEventListener('input', function (evt) {
   if (evt.target === holderCard) {
     validations.holderCard = evt.target.checkValidity();
   }
-  paymentStatus.textContent = (validations.inputCardNumbers && validations.periodCard && validations.numberCvcCard && validations.holderCard) ? 'одобрен' : 'не одобрен';
+  paymentStatus.textContent = (validations.inputCardNumbers && validations.periodCard && validations.numberCvcCard && validations.holderCard) ? 'одобрен' : 'не определён';
+});
+
+// Проверка полей на верность введенных данных
+
+inputCardNumbers.addEventListener('invalid', function () { // Валидация карты
+    if (inputCardNumbers.validity.patternMismatch) {
+      inputCardNumbers.setCustomValidity('Номер карты состоит из 16-ти цифр');
+    } else {
+      inputCardNumbers.setCustomValidity('');
+    }
+});
+
+periodCard.addEventListener('invalid', function () { // Валидация поля мм/гг
+    if (periodCard.validity.patternMismatch) {
+      periodCard.setCustomValidity('Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)');
+    } else {
+      periodCard.setCustomValidity('');
+    }
+});
+
+numberCvcCard.addEventListener('invalid', function () { // Валидация поля cvc
+    if (numberCvcCard.validity.patternMismatch) {
+      numberCvcCard.setCustomValidity('CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты');
+    } else {
+      numberCvcCard.setCustomValidity('');
+    }
+});
+
+// Станции метро // Осуществление переключения по адресу
+
+var subwayStation = {
+  'store-academicheskaya': {
+  src: 'img/map/academicheskaya.jpg',
+  describe: 'проспект Науки, д. 19, корп. 3, литер А, ТК «Платформа», 3-й этаж, секция 310'
+  },
+
+  'store-vasileostrovskaya': {
+  src: 'img/map/vasileostrovskaya.jpg',
+  describe: 'м. Василеостровская, д. 59, корп. 3, 3-й этаж, секция 210'
+  },
+
+  'store-rechka': {
+  src: 'img/map/rechka.jpg',
+  describe: 'м. Черная речка, д. 16, 1-й этаж'
+  },
+
+  'store-petrogradskaya': {
+  src: 'img/map/petrogradskaya.jpg',
+  describe: 'м. Петроградская, д. 89, корп. 3, литер А, 3-й этаж, секция 310'
+  },
+
+  'store-proletarskaya': {
+  src: 'img/map/proletarskaya.jpg',
+  describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
+  },
+
+  'store-vostaniya': {
+  src: 'img/map/vostaniya.jpg',
+  describe: 'м. Восстания, д. 44, корп. 7, 2-й этаж'
+  },
+
+  'store-prosvesheniya': {
+  src: 'img/map/prosvesheniya.jpg',
+  describe: 'м. Просвещения, д. 19, корп. 4, 1-й этаж'
+  },
+
+  'store-frunzenskaya': {
+  src: 'img/map/frunzenskaya.jpg',
+  describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
+  },
+
+  'store-chernishevskaya': {
+  src: 'img/map/chernishevskaya.jpg',
+  describe: 'м. Чернышевская, д. 75, корп. 4, 2-й этаж'
+  },
+
+  'store-tehinstitute': {
+  src: 'img/map/tehinstitute.jpg',
+  describe: 'м. Технологический институт, д. 55, корп. 7, 3-й этаж'
+  }
+};
+
+// По нажатии на метро выбираешь конкретное
+
+var listSubways = orderForm.querySelector('.deliver__store-list'); // Список всех станций метро
+var mapImageSubways = orderForm.querySelector('.deliver__store-map-img'); // Изображения карт станций метро
+var describeSubways = orderForm.querySelector('.deliver__store-describe'); // Адрес метро
+
+listSubways.addEventListener('change', function (evt) {
+  mapImageSubways.src = subwayStation[evt.target.id].src;
+  describeSubways.textContent = subwayStation[evt.target.id].describe;
 });

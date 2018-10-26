@@ -24,7 +24,7 @@
       <h2 class="visually-hidden">Каталог товаров</h2>
 
       <aside class="catalog__sidebar">
-        <form action="/">
+        <form enctype="multipart/form-data" action="https://js.dump.academy/candyshop" method="post">
 
           <ul class="catalog__filter">
             <li class="input-btn">
@@ -144,7 +144,7 @@
     <section class="buy">
       <h2 class="visually-hidden">Оформление покупки</h2>
 
-      <form action="/" method="post">
+      <form enctype="multipart/form-data" action="https://js.dump.academy/candyshop" method="post">
         <section class="goods">
           <div class="goods__wrap container">
             <h2 class="group-title goods__title" id="basket">Твои покупки</h2>
@@ -207,7 +207,7 @@
               <p class="payment__method toggle-btn">
                 <input type="radio" class="toggle-btn__input visually-hidden" name="pay-method" value="card" id="payment__card" checked>
                 <label for="payment__card" class="toggle-btn__label">Банковская карта</label>
-                <input type="radio" class="toggle-btn__input visually-hidden" name="pay-method" value="cash" id="payment__cash">
+                <input type="radio" class="toggle-btn__input visually-hidden" maxlength="16" name="pay-method" value="cash" id="payment__cash" required>
                 <label for="payment__cash" class="toggle-btn__label">Наличные при получении</label>
               </p>
 
@@ -215,17 +215,17 @@
                 <div class="payment__inputs">
                   <div class="payment__card-group">
                     <p class="text-input text-input--light payment__input-wrap payment__input-wrap--card-number">
-                      <input type="text" class="text-input__input" maxlength="16" name="card-number" id="payment__card-number" placeholder="Номер карты" required>
+                      <input type="text" class="text-input__input" maxlength="16" name="card-number" pattern="[0-9]{16}" id="payment__card-number" placeholder="Номер карты" required>
                       <label class="text-input__label" for="payment__card-number">Номер карты</label>
                     </p>
 
                     <p class="text-input text-input--light payment__input-wrap payment__input-wrap--card-date">
-                      <input type="text" class="text-input__input" name="card-date" id="payment__card-date" placeholder="мм/гг" required>
+                      <input type="text" class="text-input__input" name="card-date" pattern="[0-9]{2}\/[0-9]{2}" id="payment__card-date" placeholder="мм/гг" required>
                       <label class="text-input__label" for="payment__card-date">мм/гг</label>
                     </p>
 
                     <p class="text-input text-input--light payment__input-wrap payment__input-wrap--cvc">
-                      <input type="text" class="text-input__input" name="card-cvc" min="100" max="999" maxlength="3" id="payment__card-cvc" placeholder="CVC" required>
+                      <input type="text" class="text-input__input" name="card-cvc" pattern="[1-9]{1}[0-9]{2}" min="100" max="999" maxlength="3" id="payment__card-cvc" placeholder="CVC" required>
                       <label class="text-input__label text-input__label--lock" for="payment__card-cvc">CVC</label>
                     </p>
 
