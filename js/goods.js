@@ -321,12 +321,15 @@ var sumPrice = function () {
 };
 
 // Находим на странице поле оформления заказа
+
 var orderForm = document.querySelector('#order');
 var payment = orderForm.querySelector('.payment');
 var paymentInputsBlock = orderForm.querySelector('.payment__inputs');
 var paymentCash = payment.querySelector('.payment__cash-wrap');
 var paymentCard = payment.querySelector('.payment__card-wrap');
 var paymentBlock = document.querySelector('.payment__method');
+
+// Переключение способа оплаты
 
 var onPaymentBlockChange = function () {
   paymentCard.classList.toggle('visually-hidden');
@@ -344,23 +347,22 @@ var delivery = orderForm.querySelector('.deliver');
 var deliveryStore = delivery.querySelector('.deliver__store');
 var deliveryCourier = delivery.querySelector('.deliver__courier');
 var deliveryBlock = document.querySelector('.deliver__toggle');
-var deliveryInputs = deliveryCourier.querySelectorAll('input, textarea');
+var deliveryFields = deliveryCourier.querySelector('.deliver__entry-fields-wrap');
+var deliveryInputs = deliveryFields.querySelectorAll('.text-input__input', '.deliver__textarea');
 
 // Переключение способа доставки
 
-var switchDeliveryMethods = function (evt) {
-  if (evt.target.id === 'deliver__courier' ||
-    evt.target.id === 'deliver__store') {
-    deliveryStore.classList.toggle('visually-hidden');
-    deliveryCourier.classList.toggle('visually-hidden');
-  }
+var switchDeliveryMethods = function () {
+  deliveryStore.classList.toggle('visually-hidden');
+  deliveryCourier.classList.toggle('visually-hidden');
+
   if (deliveryCourier.classList.contains('visually-hidden')) {
-    deliveryInputs.forEach(function (it) {
-      it.disabled = true;
+    deliveryInputs.forEach(function (input) {
+      input.disabled = true;
     });
   } else {
-    deliveryInputs.forEach(function (it) {
-      it.disabled = false;
+    deliveryInputs.forEach(function (input) {
+      input.disabled = false;
     });
   }
 };
@@ -440,80 +442,80 @@ paymentCard.addEventListener('input', function (evt) {
 // Проверка полей на верность введенных данных
 
 inputCardNumbers.addEventListener('invalid', function () { // Валидация карты
-    if (inputCardNumbers.validity.patternMismatch) {
-      inputCardNumbers.setCustomValidity('Номер карты состоит из 16-ти цифр');
-    } else {
-      inputCardNumbers.setCustomValidity('');
-    }
+  if (inputCardNumbers.validity.patternMismatch) {
+    inputCardNumbers.setCustomValidity('Номер карты состоит из 16-ти цифр');
+  } else {
+    inputCardNumbers.setCustomValidity('');
+  }
 });
 
 periodCard.addEventListener('invalid', function () { // Валидация поля мм/гг
-    if (periodCard.validity.patternMismatch) {
-      periodCard.setCustomValidity('Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)');
-    } else {
-      periodCard.setCustomValidity('');
-    }
+  if (periodCard.validity.patternMismatch) {
+    periodCard.setCustomValidity('Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)');
+  } else {
+    periodCard.setCustomValidity('');
+  }
 });
 
 numberCvcCard.addEventListener('invalid', function () { // Валидация поля cvc
-    if (numberCvcCard.validity.patternMismatch) {
-      numberCvcCard.setCustomValidity('CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты');
-    } else {
-      numberCvcCard.setCustomValidity('');
-    }
+  if (numberCvcCard.validity.patternMismatch) {
+    numberCvcCard.setCustomValidity('CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты');
+  } else {
+    numberCvcCard.setCustomValidity('');
+  }
 });
 
 // Станции метро // Осуществление переключения по адресу
 
 var subwayStation = {
   'store-academicheskaya': {
-  src: 'img/map/academicheskaya.jpg',
-  describe: 'проспект Науки, д. 19, корп. 3, литер А, ТК «Платформа», 3-й этаж, секция 310'
+    src: 'img/map/academicheskaya.jpg',
+    describe: 'проспект Науки, д. 19, корп. 3, литер А, ТК «Платформа», 3-й этаж, секция 310'
   },
 
   'store-vasileostrovskaya': {
-  src: 'img/map/vasileostrovskaya.jpg',
-  describe: 'м. Василеостровская, д. 59, корп. 3, 3-й этаж, секция 210'
+    src: 'img/map/vasileostrovskaya.jpg',
+    describe: 'м. Василеостровская, д. 59, корп. 3, 3-й этаж, секция 210'
   },
 
   'store-rechka': {
-  src: 'img/map/rechka.jpg',
-  describe: 'м. Черная речка, д. 16, 1-й этаж'
+    src: 'img/map/rechka.jpg',
+    describe: 'м. Черная речка, д. 16, 1-й этаж'
   },
 
   'store-petrogradskaya': {
-  src: 'img/map/petrogradskaya.jpg',
-  describe: 'м. Петроградская, д. 89, корп. 3, литер А, 3-й этаж, секция 310'
+    src: 'img/map/petrogradskaya.jpg',
+    describe: 'м. Петроградская, д. 89, корп. 3, литер А, 3-й этаж, секция 310'
   },
 
   'store-proletarskaya': {
-  src: 'img/map/proletarskaya.jpg',
-  describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
+    src: 'img/map/proletarskaya.jpg',
+    describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
   },
 
   'store-vostaniya': {
-  src: 'img/map/vostaniya.jpg',
-  describe: 'м. Восстания, д. 44, корп. 7, 2-й этаж'
+    src: 'img/map/vostaniya.jpg',
+    describe: 'м. Восстания, д. 44, корп. 7, 2-й этаж'
   },
 
   'store-prosvesheniya': {
-  src: 'img/map/prosvesheniya.jpg',
-  describe: 'м. Просвещения, д. 19, корп. 4, 1-й этаж'
+    src: 'img/map/prosvesheniya.jpg',
+    describe: 'м. Просвещения, д. 19, корп. 4, 1-й этаж'
   },
 
   'store-frunzenskaya': {
-  src: 'img/map/frunzenskaya.jpg',
-  describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
+    src: 'img/map/frunzenskaya.jpg',
+    describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
   },
 
   'store-chernishevskaya': {
-  src: 'img/map/chernishevskaya.jpg',
-  describe: 'м. Чернышевская, д. 75, корп. 4, 2-й этаж'
+    src: 'img/map/chernishevskaya.jpg',
+    describe: 'м. Чернышевская, д. 75, корп. 4, 2-й этаж'
   },
 
   'store-tehinstitute': {
-  src: 'img/map/tehinstitute.jpg',
-  describe: 'м. Технологический институт, д. 55, корп. 7, 3-й этаж'
+    src: 'img/map/tehinstitute.jpg',
+    describe: 'м. Технологический институт, д. 55, корп. 7, 3-й этаж'
   }
 };
 
