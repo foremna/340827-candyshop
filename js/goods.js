@@ -357,18 +357,22 @@ var deliveryStoreInput = orderForm.querySelector('input[id=deliver__store]');
 // Переключение способа доставки
 
 var switchDeliveryMethods = function () {
-  deliveryStore.classList.toggle('visually-hidden');
+  deliveryStore.classList.toggle('visually-hidden'); // Способ номер один
   deliveryCourier.classList.toggle('visually-hidden');
 
-  if (deliveryStoreInput.checked) {
-    deliveryInputs.forEach(function (input) {
-      input.disabled = true;
-    });
-  } else {
-    deliveryInputs.forEach(function (input) {
-      input.disabled = false;
-    });
-  }
+  deliveryInputs.forEach(function (input) {
+    input.toggleAttribute('disabled');
+  });
+
+  // if (deliveryStoreInput.checked) { // Способ номер два
+  //   deliveryInputs.forEach(function (input) {
+  //     input.disabled = true;
+  //   });
+  // } else {
+  //   deliveryInputs.forEach(function (input) {
+  //     input.disabled = false;
+  //   });
+  // }
 };
 
 deliveryBlock.addEventListener('change', switchDeliveryMethods);
@@ -536,18 +540,18 @@ listSubways.addEventListener('change', function (evt) {
   describeSubways.textContent = subwayStation[evt.target.id].describe;
 });
 
-var submitWrap = document.querySelector('.buy__submit-btn-wrap');
-var btnSubmit = submitWrap.querySelector('.buy__submit-btn');
+var submitWrap = document.querySelector('.buy__submit-btn-wrap'); // Контейнер с кнопкой
+var btnSubmit = submitWrap.querySelector('.buy__submit-btn'); // Кнопка отправки форм заказа
 
-var cardInputChecked = function () {
+var cardInputChecked = function () { // Функция делает чекнутой кнопку "Банковская карта"
   paymentCardInput.checked();
 };
 
-var deliveryInputChecked = function () {
+var deliveryInputChecked = function () { // Функция делает чекнутой кнопку "Заеду"
   deliveryStoreInput.checked();
 };
 
-var resetSettings = function () {
+var resetSettings = function () { // Функция очищает все поля ввода
   var allInput = payment.querySelectorAll('input');
   allInput.forEach(function (input) {
     input.value = '';
@@ -557,4 +561,4 @@ var resetSettings = function () {
   deliveryInputChecked();
 };
 
-btnSubmit.addEventListener('submit', resetSettings);
+btnSubmit.addEventListener('submit', resetSettings); // При нажатии на кнопку "Заверните" очищаются поля и радиокнопки приводятся в состояние по умолчанию
