@@ -328,6 +328,8 @@ var paymentInputsBlock = orderForm.querySelector('.payment__inputs');
 var paymentCash = payment.querySelector('.payment__cash-wrap');
 var paymentCard = payment.querySelector('.payment__card-wrap');
 var paymentBlock = document.querySelector('.payment__method');
+var paymentCardInput = payment.querySelector('input[id=payment__card]');
+// var paymentCashInput = payment.querySelector('input[id=payment__cash]');
 
 // Переключение способа оплаты
 
@@ -349,6 +351,8 @@ var deliveryCourier = delivery.querySelector('.deliver__courier');
 var deliveryBlock = document.querySelector('.deliver__toggle');
 var deliveryFields = deliveryCourier.querySelector('.deliver__entry-fields-wrap');
 var deliveryInputs = deliveryFields.querySelectorAll('.text-input__input', '.deliver__textarea');
+var deliveryStoreInput = orderForm.querySelector('input[id=deliver__store]');
+// var deliveryCourierInput = orderForm.querySelector('input[id=deliver__courier]');
 
 // Переключение способа доставки
 
@@ -356,7 +360,7 @@ var switchDeliveryMethods = function () {
   deliveryStore.classList.toggle('visually-hidden');
   deliveryCourier.classList.toggle('visually-hidden');
 
-  if (deliveryCourier.classList.contains('visually-hidden')) {
+  if (deliveryStoreInput.checked) {
     deliveryInputs.forEach(function (input) {
       input.disabled = true;
     });
@@ -422,6 +426,8 @@ var validations = {
   numberCvcCard: false,
   holderCard: false
 };
+
+// Одобряем карту при валидации полей и верной карты
 
 paymentCard.addEventListener('input', function (evt) {
   if (evt.target === inputCardNumbers) {
@@ -529,3 +535,26 @@ listSubways.addEventListener('change', function (evt) {
   mapImageSubways.src = subwayStation[evt.target.id].src;
   describeSubways.textContent = subwayStation[evt.target.id].describe;
 });
+
+var submitWrap = document.querySelector('.buy__submit-btn-wrap');
+var btnSubmit = submitWrap.querySelector('.buy__submit-btn');
+
+var cardInputChecked = function () {
+  paymentCardInput.checked();
+};
+
+var deliveryInputChecked = function () {
+  deliveryStoreInput.checked();
+};
+
+var resetSettings = function () {
+  var allInput = payment.querySelectorAll('input');
+  allInput.forEach(function (input) {
+    input.value = '';
+  });
+
+  cardInputChecked();
+  deliveryInputChecked();
+};
+
+btnSubmit.addEventListener('submit', resetSettings);
