@@ -378,12 +378,14 @@ var switchDeliveryMethods = function () {
 deliveryBlock.addEventListener('change', switchDeliveryMethods);
 
 // Кнопки ползунка цены
-var rangeFilter = document.querySelector('.range__filter');
-var maxPriceFilter = document.querySelector('.range__price--max');
-var minPriceFilter = document.querySelector('.range__price--min');
+var rangeSlider = document.querySelector('.range');
+var rangeFilter = rangeSlider.querySelector('.range__filter');
+var maxPriceFilter = rangeSlider.querySelector('.range__price--max');
+var minPriceFilter = rangeSlider.querySelector('.range__price--min');
+// var btnLeftRange = rangeSlider.querySelector('.range__btn--left');
+// var btnRightRange = rangeSlider.querySelector('.range__btn--right');
 
-
-// // Работа ползунка цены товаров
+// Работа ползунка цены товаров
 
 var countsPercentageWidth = function (evt) {
   var priceBarWidth = rangeFilter.clientWidth;
@@ -422,6 +424,18 @@ var checkCardNumberValidity = function (value) {
   return cardDataArraySum % 10 === 0;
 };
 
+var checkCardPeriodValidity = function () {
+  periodCard.checkValidity(); // Если валидно - true, не валидно - false
+};
+
+var checkCardCvcValidity = function () {
+  numberCvcCard.checkValidity(); // Если валидно - true, не валидно - false
+};
+
+var checkCardHolderValidity = function () {
+  holderCard.checkValidity(); // Если валидно - true, не валидно - false
+};
+
 // Если поля пустые
 
 var validations = {
@@ -434,17 +448,18 @@ var validations = {
 // Одобряем карту при валидации полей и верной карты
 
 paymentCard.addEventListener('input', function (evt) {
+  evt.target.checkValidity();
   if (evt.target === inputCardNumbers) {
     validations.inputCardNumbers = checkCardNumberValidity(evt.target.value);
   }
   if (evt.target === periodCard) {
-    validations.periodCard = evt.target.checkValidity();
+    validations.periodCard = checkCardPeriodValidity();
   }
   if (evt.target === numberCvcCard) {
-    validations.numberCvcCard = evt.target.checkValidity();
+    validations.numberCvcCard = checkCardCvcValidity();
   }
   if (evt.target === holderCard) {
-    validations.holderCard = evt.target.checkValidity();
+    validations.holderCard = checkCardHolderValidity();
   }
   paymentStatus.textContent = (validations.inputCardNumbers && validations.periodCard && validations.numberCvcCard && validations.holderCard) ? 'одобрен' : 'не определён';
 });
@@ -452,27 +467,15 @@ paymentCard.addEventListener('input', function (evt) {
 // Проверка полей на верность введенных данных
 
 inputCardNumbers.addEventListener('invalid', function () { // Валидация карты
-  if (inputCardNumbers.validity.patternMismatch) {
-    inputCardNumbers.setCustomValidity('Номер карты состоит из 16-ти цифр');
-  } else {
-    inputCardNumbers.setCustomValidity('');
-  }
+  inputCardNumbers.validity.patternMismatch ? inputCardNumbers.setCustomValidity('Номер карты состоит из 16-ти цифр') : inputCardNumbers.setCustomValidity('');
 });
 
 periodCard.addEventListener('invalid', function () { // Валидация поля мм/гг
-  if (periodCard.validity.patternMismatch) {
-    periodCard.setCustomValidity('Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)');
-  } else {
-    periodCard.setCustomValidity('');
-  }
+  periodCard.validity.patternMismatch ? periodCard.setCustomValidity('Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)') : periodCard.setCustomValidity('');
 });
 
 numberCvcCard.addEventListener('invalid', function () { // Валидация поля cvc
-  if (numberCvcCard.validity.patternMismatch) {
-    numberCvcCard.setCustomValidity('CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты');
-  } else {
-    numberCvcCard.setCustomValidity('');
-  }
+  numberCvcCard.validity.patternMismatch ? numberCvcCard.setCustomValidity('CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты') : numberCvcCard.setCustomValidity('');
 });
 
 // Станции метро // Осуществление переключения по адресу
