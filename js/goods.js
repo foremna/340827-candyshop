@@ -378,26 +378,113 @@ var switchDeliveryMethods = function () {
 deliveryBlock.addEventListener('change', switchDeliveryMethods);
 
 // Кнопки ползунка цены
-var rangeSlider = document.querySelector('.range');
-var rangeFilter = rangeSlider.querySelector('.range__filter');
-var maxPriceFilter = rangeSlider.querySelector('.range__price--max');
-var minPriceFilter = rangeSlider.querySelector('.range__price--min');
-// var btnLeftRange = rangeSlider.querySelector('.range__btn--left');
-// var btnRightRange = rangeSlider.querySelector('.range__btn--right');
 
-// Работа ползунка цены товаров
+var range = document.querySelector('.range');
+var rangeFilter = range.querySelector('.range__filter'); // Сам фильтр
+var rangeFilterFill = range.querySelector('.range__fill-line'); // Фиолетовая линия
+var rangeBtnLeft = range.querySelector('.range__btn--left'); // Левый ползунок
+var rangeBtnRight = range.querySelector('.range__btn--right'); // Правый ползунок
+var minPriceFilter = range.querySelector('.range__price--min'); // Окошечко минимальной цены
+var maxPriceFilter = range.querySelector('.range__price--max'); // Окошечко максимальной цены
+var min = parseInt(getComputedStyle(rangeBtnLeft).left, 10);
+var max = parseInt(getComputedStyle(rangeBtnRight).left, 10);
+var MIN = 0;
+var MAX = 245;
+var FILTER_WIDTH = 245;
 
-var countsPercentageWidth = function (evt) {
-  var priceBarWidth = rangeFilter.clientWidth;
-  var priceBarWidthHardCode = 100;
-  if (evt.target.classList.contains('range__btn--right')) {
-    maxPriceFilter.textContent = Math.round(priceBarWidthHardCode * (evt.target.offsetLeft / priceBarWidth));
-  } else if (evt.target.classList.contains('range__btn--left')) {
-    minPriceFilter.textContent = Math.round(priceBarWidthHardCode * (evt.target.offsetLeft / priceBarWidth));
+// Работа фильтра по выбору диапазона цены
+
+function getResultMinMax(minValue, maxValue) {
+  minPriceFilter.textContent = parseInt(minValue, 10);
+  maxPriceFilter.textContent = parseInt(maxValue, 10);
+}
+
+getResultMinMax(min, max); // Координаты слайдера range
+var rangeFilterCoordinate = getCoordinates(rangeFilter);
+
+rangeBtnLeft.addEventListener('mousedown', rangeBtnLeftPressMouse);
+rangeBtnRight.addEventListener('mousedown', rangeBtnRightPressMouse);
+
+function rangeBtnLeftPressMouse(evt) {
+  var elMinCoords = getCoordinates(rangeBtnLeft);
+  var shiftX = evt.pageX - elMinCoords.left;
+  document.addEventListener('mousemove', rangeBtnLeftPressMoveMouse);
+
+  function rangeBtnLeftPressMoveMouse(e) {
+    getLeftFilterCoorditanes(e, shiftX);
   }
-};
 
-rangeFilter.addEventListener('mouseup', countsPercentageWidth);
+  document.addEventListener('mouseup', rangeBtnLeftPressUpMouse);
+
+  function rangeBtnLeftPressUpMouse(event) {
+    getLeftFilterCoorditanes(event, shiftX);
+    getResultMinMax(min, max);
+
+    document.removeEventListener('mousemove', rangeBtnLeftPressMoveMouse);
+    document.removeEventListener('mouseup', rangeBtnLeftPressUpMouse);
+  }
+  return false;
+}
+
+function getLeftFilterCoorditanes(e, shiftX) {
+  var newLeft = e.pageX - shiftX - rangeFilterCoordinate.left;
+
+  if (newLeft < MIN) {
+    newLeft = MIN;
+  }
+  if (newLeft > max - rangeBtnLeft.offsetWidth / 2) {
+    newLeft = max - rangeBtnLeft.offsetWidth / 2;
+  }
+  min = newLeft;
+  rangeBtnLeft.style.left = newLeft + 'px';
+  rangeFilterFill.style.left = (newLeft + rangeBtnLeft.offsetWidth / 2) + 'px';
+}
+
+function rangeBtnRightPressMouse(evt) {
+  var elMaxCoords = getCoordinates(rangeBtnRight);
+  var shiftX = evt.pageX - elMaxCoords.left;
+  document.addEventListener('mousemove', rangeBtnRightPressMoveMouse);
+
+  function rangeBtnRightPressMoveMouse(e) {
+    getRightFilterCoordinates(e, shiftX);
+  }
+
+  document.addEventListener('mouseup', rangeBtnRightPressUpMouse);
+
+  function rangeBtnRightPressUpMouse(event) {
+    getRightFilterCoordinates(event, shiftX);
+    getResultMinMax(min, max);
+
+    document.removeEventListener('mousemove', rangeBtnRightPressMoveMouse);
+    document.removeEventListener('mouseup', rangeBtnRightPressUpMouse);
+  }
+  return false;
+}
+
+function getRightFilterCoordinates(e, shiftX) {
+  var newRight = e.pageX - shiftX - rangeFilterCoordinate.left;
+
+  if (newRight > MAX) {
+    newRight = MAX;
+  }
+
+  if (newRight < min + rangeBtnLeft.offsetWidth / 2) {
+    newRight = min + rangeBtnLeft.offsetWidth / 2;
+  }
+
+  max = newRight;
+  rangeBtnRight.style.left = newRight + 'px';
+  rangeFilterFill.style.right = FILTER_WIDTH - newRight + 'px';
+}
+
+function getCoordinates(elem) {
+  var elCoords = elem.getBoundingClientRect();
+
+  return {
+    top: elCoords.top + pageYOffset,
+    left: elCoords.left + pageXOffset,
+  };
+}
 
 // Оплата заказа
 
