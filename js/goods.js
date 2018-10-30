@@ -321,12 +321,17 @@ var sumPrice = function () {
 };
 
 // Находим на странице поле оформления заказа
+
 var orderForm = document.querySelector('#order');
 var payment = orderForm.querySelector('.payment');
 var paymentInputsBlock = orderForm.querySelector('.payment__inputs');
 var paymentCash = payment.querySelector('.payment__cash-wrap');
 var paymentCard = payment.querySelector('.payment__card-wrap');
 var paymentBlock = document.querySelector('.payment__method');
+var paymentCardInput = payment.querySelector('input[id=payment__card]');
+// var paymentCashInput = payment.querySelector('input[id=payment__cash]');
+
+// Переключение способа оплаты
 
 var onPaymentBlockChange = function () {
   paymentCard.classList.toggle('visually-hidden');
@@ -344,26 +349,43 @@ var delivery = orderForm.querySelector('.deliver');
 var deliveryStore = delivery.querySelector('.deliver__store');
 var deliveryCourier = delivery.querySelector('.deliver__courier');
 var deliveryBlock = document.querySelector('.deliver__toggle');
+var deliveryFields = deliveryCourier.querySelector('.deliver__entry-fields-wrap');
+var deliveryInputs = deliveryFields.querySelectorAll('.text-input__input', '.deliver__textarea');
+var deliveryStoreInput = orderForm.querySelector('input[id=deliver__store]');
+// var deliveryCourierInput = orderForm.querySelector('input[id=deliver__courier]');
 
 // Переключение способа доставки
+
 var switchDeliveryMethods = function () {
+  deliveryStore.classList.toggle('visually-hidden'); // Способ номер один
   deliveryCourier.classList.toggle('visually-hidden');
-  deliveryStore.classList.toggle('visually-hidden');
-  var deliveryInputs = deliveryCourier.querySelectorAll('input, textarea');
+
   deliveryInputs.forEach(function (input) {
     input.toggleAttribute('disabled');
   });
+
+  // if (deliveryStoreInput.checked) { // Способ номер два
+  //   deliveryInputs.forEach(function (input) {
+  //     input.disabled = true;
+  //   });
+  // } else {
+  //   deliveryInputs.forEach(function (input) {
+  //     input.disabled = false;
+  //   });
+  // }
 };
 
 deliveryBlock.addEventListener('change', switchDeliveryMethods);
 
 // Кнопки ползунка цены
-var rangeFilter = document.querySelector('.range__filter');
-var maxPriceFilter = document.querySelector('.range__price--max');
-var minPriceFilter = document.querySelector('.range__price--min');
+var rangeSlider = document.querySelector('.range');
+var rangeFilter = rangeSlider.querySelector('.range__filter');
+var maxPriceFilter = rangeSlider.querySelector('.range__price--max');
+var minPriceFilter = rangeSlider.querySelector('.range__price--min');
+// var btnLeftRange = rangeSlider.querySelector('.range__btn--left');
+// var btnRightRange = rangeSlider.querySelector('.range__btn--right');
 
-
-// // Работа ползунка цены товаров
+// Работа ползунка цены товаров
 
 var countsPercentageWidth = function (evt) {
   var priceBarWidth = rangeFilter.clientWidth;
@@ -376,3 +398,160 @@ var countsPercentageWidth = function (evt) {
 };
 
 rangeFilter.addEventListener('mouseup', countsPercentageWidth);
+
+// Оплата заказа
+
+var numberCvcCard = paymentCard.querySelector('input[name=card-cvc]');
+var periodCard = paymentCard.querySelector('input[name=card-date]');
+var inputCardNumbers = paymentCard.querySelector('input[name=card-number]');
+var holderCard = paymentCard.querySelector('input[name=cardholder]');
+var paymentStatus = paymentCard.querySelector('.payment__card-status');
+
+// Алгоритм Луна
+
+var checkCardNumberValidity = function (value) {
+  var cardData = value;
+  var cardDataArray = cardData.split('');
+  var cardDataArraySum = cardDataArray.map(function (item) {
+    return parseInt(item, 10);
+  }).map(function (item) {
+    return item % 2 !== 0 ? item * 2 : item;
+  }).map(function (item) {
+    return item > 10 ? item - 9 : item;
+  }).reduce(function (sum, current) {
+    return sum + current;
+  }, 0);
+  return cardDataArraySum % 10 === 0;
+};
+// Если поля пустые
+
+var validations = {
+  inputCardNumbers: false,
+  periodCard: false,
+  numberCvcCard: false,
+  holderCard: false
+};
+
+// Одобряем карту при валидации полей и верной карты
+
+paymentCard.addEventListener('input', function (evt) {
+  evt.target.checkValidity();
+  if (evt.target === inputCardNumbers) {
+    validations.inputCardNumbers = checkCardNumberValidity(evt.target.value);
+  }
+  if (evt.target === periodCard) {
+    validations.periodCard = periodCard.checkValidity();
+  }
+  if (evt.target === numberCvcCard) {
+    validations.numberCvcCard = numberCvcCard.checkValidity();
+  }
+  if (evt.target === holderCard) {
+    validations.holderCard = holderCard.checkValidity();
+  }
+  paymentStatus.textContent = (validations.inputCardNumbers && validations.periodCard && validations.numberCvcCard && validations.holderCard) ? 'одобрен' : 'не определён';
+});
+
+// Проверка полей на верность введенных данных
+
+inputCardNumbers.addEventListener('invalid', function () { // Валидация карты
+  // inputCardNumbers.validity.patternMismatch ? inputCardNumbers.setCustomValidity('Номер карты состоит из 16-ти цифр') : inputCardNumbers.setCustomValidity('');
+  inputCardNumbers.setCustomValidity(inputCardNumbers.validity.patternMismatch ? 'Номер карты состоит из 16-ти цифр' : '');
+});
+
+periodCard.addEventListener('invalid', function () { // Валидация поля мм/гг
+  // periodCard.validity.patternMismatch ? periodCard.setCustomValidity('Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)') : periodCard.setCustomValidity('');
+  periodCard.setCustomValidity(periodCard.validity.patternMismatch ? 'Пожалуйста, введите срок действия карты в формате мм/гг (месяц/год)' : '');
+});
+
+numberCvcCard.addEventListener('invalid', function () { // Валидация поля cvc
+  // numberCvcCard.validity.patternMismatch ? numberCvcCard.setCustomValidity('CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты') : numberCvcCard.setCustomValidity('');
+  numberCvcCard.setCustomValidity(numberCvcCard.validity.patternMismatch ? 'CVC Должен состоять из 3-х цифр. Узнать его можно на оборотной стороне карты' : '');
+});
+
+// Станции метро // Осуществление переключения по адресу
+
+var subwayStation = {
+  'store-academicheskaya': {
+    src: 'img/map/academicheskaya.jpg',
+    describe: 'проспект Науки, д. 19, корп. 3, литер А, ТК «Платформа», 3-й этаж, секция 310'
+  },
+
+  'store-vasileostrovskaya': {
+    src: 'img/map/vasileostrovskaya.jpg',
+    describe: 'м. Василеостровская, д. 59, корп. 3, 3-й этаж, секция 210'
+  },
+
+  'store-rechka': {
+    src: 'img/map/rechka.jpg',
+    describe: 'м. Черная речка, д. 16, 1-й этаж'
+  },
+
+  'store-petrogradskaya': {
+    src: 'img/map/petrogradskaya.jpg',
+    describe: 'м. Петроградская, д. 89, корп. 3, литер А, 3-й этаж, секция 310'
+  },
+
+  'store-proletarskaya': {
+    src: 'img/map/proletarskaya.jpg',
+    describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
+  },
+
+  'store-vostaniya': {
+    src: 'img/map/vostaniya.jpg',
+    describe: 'м. Восстания, д. 44, корп. 7, 2-й этаж'
+  },
+
+  'store-prosvesheniya': {
+    src: 'img/map/prosvesheniya.jpg',
+    describe: 'м. Просвещения, д. 19, корп. 4, 1-й этаж'
+  },
+
+  'store-frunzenskaya': {
+    src: 'img/map/frunzenskaya.jpg',
+    describe: 'м. Пролетарская, д. 75, корп. 4, 2-й этаж'
+  },
+
+  'store-chernishevskaya': {
+    src: 'img/map/chernishevskaya.jpg',
+    describe: 'м. Чернышевская, д. 75, корп. 4, 2-й этаж'
+  },
+
+  'store-tehinstitute': {
+    src: 'img/map/tehinstitute.jpg',
+    describe: 'м. Технологический институт, д. 55, корп. 7, 3-й этаж'
+  }
+};
+
+// По нажатии на метро выбираешь конкретное
+
+var listSubways = orderForm.querySelector('.deliver__store-list'); // Список всех станций метро
+var mapImageSubways = orderForm.querySelector('.deliver__store-map-img'); // Изображения карт станций метро
+var describeSubways = orderForm.querySelector('.deliver__store-describe'); // Адрес метро
+
+listSubways.addEventListener('change', function (evt) {
+  mapImageSubways.src = subwayStation[evt.target.id].src;
+  describeSubways.textContent = subwayStation[evt.target.id].describe;
+});
+
+var submitWrap = document.querySelector('.buy__submit-btn-wrap'); // Контейнер с кнопкой
+var btnSubmit = submitWrap.querySelector('.buy__submit-btn'); // Кнопка отправки форм заказа
+
+var cardInputChecked = function () { // Функция делает чекнутой кнопку "Банковская карта"
+  paymentCardInput.checked();
+};
+
+var deliveryInputChecked = function () { // Функция делает чекнутой кнопку "Заеду"
+  deliveryStoreInput.checked();
+};
+
+var resetSettings = function () { // Функция очищает все поля ввода
+  var allInput = payment.querySelectorAll('input');
+  allInput.forEach(function (input) {
+    input.value = '';
+  });
+
+  cardInputChecked();
+  deliveryInputChecked();
+};
+
+btnSubmit.addEventListener('submit', resetSettings); // При нажатии на кнопку "Заверните" очищаются поля и радиокнопки приводятся в состояние по умолчанию
