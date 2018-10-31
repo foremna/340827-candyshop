@@ -394,74 +394,129 @@ var FILTER_WIDTH = 245;
 
 // Работа фильтра по выбору диапазона цены
 
-function getResultMinMax(minValue, maxValue) {
+var getCoordinates = function (elem) {
+  var elCoords = elem.getBoundingClientRect();
+
+  return {
+    top: elCoords.top + pageYOffset,
+    left: elCoords.left + pageXOffset,
+  };
+};
+
+var getResultMinMax = function (minValue, maxValue) {
   minPriceFilter.textContent = parseInt(minValue, 10);
   maxPriceFilter.textContent = parseInt(maxValue, 10);
-}
+};
 
 getResultMinMax(min, max); // Координаты слайдера range
 var rangeFilterCoordinate = getCoordinates(rangeFilter);
 
-rangeBtnLeft.addEventListener('mousedown', rangeBtnLeftPressMouse);
-rangeBtnRight.addEventListener('mousedown', rangeBtnRightPressMouse);
+rangeBtnLeft.addEventListener('mousedown', rangePressMouse);
+rangeBtnRight.addEventListener('mousedown', rangePressMouse);
 
-function rangeBtnLeftPressMouse(evt) {
-  var elMinCoords = getCoordinates(rangeBtnLeft);
-  var shiftX = evt.pageX - elMinCoords.left;
-  document.addEventListener('mousemove', rangeBtnLeftPressMoveMouse);
+var rangePressMouse = function (evt) {
+  if (evt.target.classList.contains('range__btn--left')) {
+    var elMinCoords = getCoordinates(rangeBtnLeft);
+    var shiftX = evt.pageX - elMinCoords.left;
+    document.addEventListener('mousemove', rangeBtnLeftPressMoveMouse);
 
-  function rangeBtnLeftPressMoveMouse(e) {
-    getLeftFilterCoorditanes(e, shiftX);
+    var rangeBtnLeftPressMoveMouse = function (e) {
+      getLeftFilterCoorditanes(e, shiftX);
+    };
+
+    document.addEventListener('mouseup', rangeBtnLeftPressUpMouse);
+
+    var rangeBtnLeftPressUpMouse = function (event) {
+      getLeftFilterCoorditanes(event, shiftX);
+      getResultMinMax(min, max);
+
+      document.removeEventListener('mousemove', rangeBtnLeftPressMoveMouse);
+      document.removeEventListener('mouseup', rangeBtnLeftPressUpMouse);
+    };
+    return false;
   }
 
-  document.addEventListener('mouseup', rangeBtnLeftPressUpMouse);
+  if (evt.target.classList.contains('range__btn--right')) {
+    var elMaxCoords = getCoordinates(rangeBtnRight);
+    var shiftX = evt.pageX - elMaxCoords.left;
+    document.addEventListener('mousemove', rangeBtnRightPressMoveMouse);
 
-  function rangeBtnLeftPressUpMouse(event) {
-    getLeftFilterCoorditanes(event, shiftX);
-    getResultMinMax(min, max);
+    var rangeBtnRightPressMoveMouse = function (e) {
+      getRightFilterCoordinates(e, shiftX);
+    };
 
-    document.removeEventListener('mousemove', rangeBtnLeftPressMoveMouse);
-    document.removeEventListener('mouseup', rangeBtnLeftPressUpMouse);
+    document.addEventListener('mouseup', rangeBtnRightPressUpMouse);
+
+    var rangeBtnRightPressUpMouse = function (event) {
+      getRightFilterCoordinates(event, shiftX);
+      getResultMinMax(min, max);
+
+      document.removeEventListener('mousemove', rangeBtnRightPressMoveMouse);
+      document.removeEventListener('mouseup', rangeBtnRightPressUpMouse);
+    };
+    return false;
   }
-  return false;
-}
+};
 
-function getLeftFilterCoorditanes(e, shiftX) {
+// var rangeBtnLeftPressMouse = function (evt) {
+//   var elMinCoords = getCoordinates(rangeBtnLeft);
+//   var shiftX = evt.pageX - elMinCoords.left;
+//   document.addEventListener('mousemove', rangeBtnLeftPressMoveMouse);
+
+//   var rangeBtnLeftPressMoveMouse = function (e) {
+//     getLeftFilterCoorditanes(e, shiftX);
+//   }
+
+//   document.addEventListener('mouseup', rangeBtnLeftPressUpMouse);
+
+//   var rangeBtnLeftPressUpMouse = function (event) {
+//     getLeftFilterCoorditanes(event, shiftX);
+//     getResultMinMax(min, max);
+
+//     document.removeEventListener('mousemove', rangeBtnLeftPressMoveMouse);
+//     document.removeEventListener('mouseup', rangeBtnLeftPressUpMouse);
+//   }
+//   return false;
+// }
+
+var getLeftFilterCoorditanes = function (e, shiftX) {
   var newLeft = e.pageX - shiftX - rangeFilterCoordinate.left;
 
   if (newLeft < MIN) {
     newLeft = MIN;
   }
+
   if (newLeft > max - rangeBtnLeft.offsetWidth / 2) {
     newLeft = max - rangeBtnLeft.offsetWidth / 2;
   }
+
   min = newLeft;
   rangeBtnLeft.style.left = newLeft + 'px';
   rangeFilterFill.style.left = (newLeft + rangeBtnLeft.offsetWidth / 2) + 'px';
-}
+};
 
-function rangeBtnRightPressMouse(evt) {
-  var elMaxCoords = getCoordinates(rangeBtnRight);
-  var shiftX = evt.pageX - elMaxCoords.left;
-  document.addEventListener('mousemove', rangeBtnRightPressMoveMouse);
+// var rangeBtnRightPressMouse = function (evt) {
+//   var elMaxCoords = getCoordinates(rangeBtnRight);
+//   var shiftX = evt.pageX - elMaxCoords.left;
+//   document.addEventListener('mousemove', rangeBtnRightPressMoveMouse);
 
-  function rangeBtnRightPressMoveMouse(e) {
-    getRightFilterCoordinates(e, shiftX);
-  }
+//   var rangeBtnRightPressMoveMouse = function (e) {
+//     getRightFilterCoordinates(e, shiftX);
+//   }
 
-  document.addEventListener('mouseup', rangeBtnRightPressUpMouse);
+//   document.addEventListener('mouseup', rangeBtnRightPressUpMouse);
 
-  function rangeBtnRightPressUpMouse(event) {
-    getRightFilterCoordinates(event, shiftX);
-    getResultMinMax(min, max);
+//   var rangeBtnRightPressUpMouse = function (event) {
+//     getRightFilterCoordinates(event, shiftX);
+//     getResultMinMax(min, max);
 
-    document.removeEventListener('mousemove', rangeBtnRightPressMoveMouse);
-    document.removeEventListener('mouseup', rangeBtnRightPressUpMouse);
-  }
-  return false;
-}
+//     document.removeEventListener('mousemove', rangeBtnRightPressMoveMouse);
+//     document.removeEventListener('mouseup', rangeBtnRightPressUpMouse);
+//   }
+//   return false;
+// }
 
-function getRightFilterCoordinates(e, shiftX) {
+var getRightFilterCoordinates = function (e, shiftX) {
   var newRight = e.pageX - shiftX - rangeFilterCoordinate.left;
 
   if (newRight > MAX) {
@@ -475,16 +530,16 @@ function getRightFilterCoordinates(e, shiftX) {
   max = newRight;
   rangeBtnRight.style.left = newRight + 'px';
   rangeFilterFill.style.right = FILTER_WIDTH - newRight + 'px';
-}
+};
 
-function getCoordinates(elem) {
-  var elCoords = elem.getBoundingClientRect();
+// var getCoordinates = function (elem) {
+//   var elCoords = elem.getBoundingClientRect();
 
-  return {
-    top: elCoords.top + pageYOffset,
-    left: elCoords.left + pageXOffset,
-  };
-}
+//   return {
+//     top: elCoords.top + pageYOffset,
+//     left: elCoords.left + pageXOffset,
+//   };
+// };
 
 // Оплата заказа
 
